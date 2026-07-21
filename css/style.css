@@ -1,0 +1,26 @@
+  :root{ --violet:#F68B1E; --violet-dark:#D9740F; --ink:#0B0B12; }
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif; color:var(--ink);}
+  .font-display{font-family:'Inter',system-ui,-apple-system,sans-serif; letter-spacing:-0.02em;}
+  .star{color:#F5A623;}
+  .brand-grad{background:var(--violet);}
+  .drawer{transition:transform .35s ease;}
+  .fade{transition:opacity .25s ease;}
+  .prod-card{cursor:pointer;}
+  .qty-btn{width:26px;height:26px;display:flex;align-items:center;justify-content:center;}
+  ::-webkit-scrollbar{width:6px;height:6px;}
+  ::-webkit-scrollbar-thumb{background:#ddd;border-radius:3px;}
+
+  /* Horizontal scroll rows on mobile, grid on desktop (Jumia style) */
+  .scroll-row{display:flex; gap:0.75rem; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; padding-bottom:4px;}
+  .scroll-row::-webkit-scrollbar{display:none;}
+  .scroll-row{scrollbar-width:none;}
+  .scroll-row > *{scroll-snap-align:start; flex:0 0 auto;}
+  @media(min-width:768px){
+    .scroll-row{display:grid; overflow-x:visible;}
+  }
+  .bottomnav-btn.active{color:var(--violet);}
+  @media(max-width:767px){
+    body{-webkit-tap-highlight-color:transparent;}
+  }
+  .cat-strip a, .cat-strip button{color:#333; white-space:nowrap;}
+  .cat-strip a:hover, .cat-strip button:hover{color:var(--violet);}

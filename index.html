@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thomex — Modern Tech Store</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-white pb-16 md:pb-0">
+
+<!-- Top utility bar (black, like Jumia) -->
+<div class="bg-[#0B0B12] text-white">
+  <div class="hidden md:flex items-center justify-between px-8 py-1.5 text-[11px]">
+    <div class="flex items-center gap-5 text-neutral-300">
+      <span>Sell on Thomex</span>
+    </div>
+    <div class="flex items-center gap-5 text-neutral-300">
+      <span class="flex items-center gap-1"><i data-lucide="truck" class="w-3 h-3"></i> Free Shipping on Orders Over KSh 5,000</span>
+      <span class="flex items-center gap-1"><i data-lucide="headphones" class="w-3 h-3"></i> Help Center</span>
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="sticky top-0 bg-white z-40 border-b border-neutral-100 shadow-sm">
+  <div class="flex items-center gap-3 px-4 md:px-8 py-3">
+    <button id="logoBtn" class="flex items-center gap-2 shrink-0">
+      <div class="w-8 h-8 rounded brand-grad flex items-center justify-center"><i data-lucide="zap" class="w-5 h-5 text-white"></i></div>
+      <span class="text-lg md:text-xl font-extrabold font-display">Thomex</span>
+    </button>
+    <div class="relative hidden md:block flex-1 max-w-2xl">
+      <div class="flex items-center bg-white border-2 border-[var(--violet)] rounded pl-4 pr-1 py-1.5">
+        <input id="searchInput" type="text" placeholder="Search products, brands and categories" class="bg-transparent outline-none text-sm flex-1"/>
+        <button id="searchBtn" class="w-8 h-8 rounded brand-grad flex items-center justify-center text-white shrink-0"><i data-lucide="search" class="w-4 h-4"></i></button>
+      </div>
+      <div id="searchSuggest" class="hidden absolute top-full mt-2 left-0 right-0 bg-white border border-neutral-100 rounded-xl shadow-lg overflow-hidden z-50"></div>
+    </div>
+    <div class="flex items-center gap-3 md:gap-5 ml-auto shrink-0">
+      <button id="accountBtn" class="hidden md:flex flex-col items-center text-[11px] font-medium text-neutral-700 hover:text-[var(--violet)] max-w-[70px]">
+        <i data-lucide="user" class="w-5 h-5"></i><span id="accountLabel" class="truncate w-full text-center">Account</span>
+      </button>
+      <button id="wishlistBtn" class="hidden md:flex relative flex-col items-center text-[11px] font-medium text-neutral-700 hover:text-[var(--violet)]">
+        <i data-lucide="heart" class="w-5 h-5"></i>Wishlist
+        <span id="wishCount" class="hidden absolute -top-1 right-2 w-4 h-4 rounded-full bg-[var(--violet)] text-white text-[9px] flex items-center justify-center">0</span>
+      </button>
+      <button id="cartBtn" class="relative flex flex-col items-center text-[11px] font-medium text-neutral-700 hover:text-[var(--violet)]">
+        <i data-lucide="shopping-cart" class="w-5 h-5"></i><span class="hidden md:inline">Cart</span>
+        <span id="cartCount" class="hidden absolute -top-1 right-1 md:right-2 w-4 h-4 rounded-full bg-[var(--violet)] text-white text-[9px] flex items-center justify-center">0</span>
+      </button>
+    </div>
+  </div>
+  <!-- Mobile search bar: always visible -->
+  <div class="md:hidden px-4 pb-3 relative">
+    <div class="flex items-center bg-white border-2 border-[var(--violet)] rounded pl-4 pr-1 py-1.5">
+      <input id="searchInputMobile" type="text" placeholder="Search products..." class="bg-transparent outline-none text-sm flex-1"/>
+      <button id="searchBtnMobile" class="w-8 h-8 rounded brand-grad flex items-center justify-center text-white shrink-0"><i data-lucide="search" class="w-4 h-4"></i></button>
+    </div>
+    <div id="searchSuggestMobile" class="hidden absolute left-4 right-4 top-full mt-1 bg-white border border-neutral-100 rounded-xl shadow-lg overflow-hidden z-50"></div>
+  </div>
+  <!-- Flat category strip (Jumia style) -->
+  <nav class="cat-strip hidden md:flex items-center gap-6 px-8 py-2.5 text-[13px] font-medium border-t border-neutral-100 overflow-x-auto">
+    <button id="categoriesNavBtn" class="flex items-center gap-1 font-semibold shrink-0">
+      <i data-lucide="menu" class="w-4 h-4"></i> All Categories
+    </button>
+    <div id="catStripLinks" class="flex items-center gap-6 shrink-0"></div>
+  </nav>
+  <div id="categoriesMegaMenu" class="hidden absolute left-0 right-0 bg-white border-t border-b border-neutral-100 shadow-xl p-6 grid grid-cols-4 gap-3 z-50"></div>
+</header>
+
+<!-- SEARCH / FILTER RESULTS (hidden by default) -->
+<section id="searchResults" class="hidden px-4 md:px-8 py-6">
+  <div class="flex items-center justify-between mb-1">
+    <h2 id="searchResultsTitle" class="text-xl font-bold font-display">Results</h2>
+    <button id="clearSearch" class="text-sm font-medium text-neutral-600 flex items-center gap-1 hover:text-[var(--violet)]"><i data-lucide="x" class="w-4 h-4"></i> Clear</button>
+  </div>
+  <p id="searchResultsCount" class="text-xs text-neutral-400 mb-4"></p>
+
+  <div class="flex items-center gap-2 mb-5">
+    <button id="openFilters" class="flex items-center gap-1.5 border border-neutral-200 rounded-full px-4 py-2 text-xs font-semibold hover:border-[var(--violet)]">
+      <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i> Filters
+      <span id="filterActiveCount" class="hidden bg-[var(--violet)] text-white text-[10px] w-4 h-4 rounded-full items-center justify-center">0</span>
+    </button>
+    <select id="sortSelect" class="border border-neutral-200 rounded-full px-4 py-2 text-xs font-semibold outline-none">
+      <option value="default">Sort: Popularity</option>
+      <option value="price-asc">Price: Low to High</option>
+      <option value="price-desc">Price: High to Low</option>
+      <option value="rating">Top Rated</option>
+    </select>
+  </div>
+
+  <div class="grid grid-cols-3 md:grid-cols-6 gap-1.5" id="searchResultsGrid"></div>
+  <p id="searchEmpty" class="hidden text-sm text-neutral-500 py-10 text-center">No products match your search. Try a different term or category.</p>
+</section>
+
+<!-- FILTERS DRAWER -->
+<div id="filterOverlay" class="hidden fixed inset-0 bg-black/50 z-50 fade opacity-0"></div>
+<div id="filterDrawer" class="fixed top-0 right-0 h-full w-full max-w-sm bg-white z-50 drawer translate-x-full flex flex-col shadow-2xl">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-neutral-100">
+    <h3 class="font-bold font-display text-lg">Filters</h3>
+    <button id="closeFilters" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-neutral-100"><i data-lucide="x" class="w-5 h-5"></i></button>
+  </div>
+  <div class="flex-1 overflow-y-auto px-5 py-4 space-y-6">
+    <div>
+      <p class="text-xs font-bold uppercase tracking-wide text-neutral-400 mb-2">Category</p>
+      <div id="filterCategories" class="flex flex-wrap gap-2"></div>
+    </div>
+    <div>
+      <p class="text-xs font-bold uppercase tracking-wide text-neutral-400 mb-2">Brand</p>
+      <div id="filterBrands" class="flex flex-wrap gap-2"></div>
+    </div>
+    <div>
+      <p class="text-xs font-bold uppercase tracking-wide text-neutral-400 mb-2">Price Range (KSh)</p>
+      <div class="flex items-center gap-2">
+        <input id="filterMinPrice" type="number" min="0" placeholder="Min" class="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm outline-none"/>
+        <span class="text-neutral-400">–</span>
+        <input id="filterMaxPrice" type="number" min="0" placeholder="Max" class="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm outline-none"/>
+      </div>
+    </div>
+    <div>
+      <p class="text-xs font-bold uppercase tracking-wide text-neutral-400 mb-2">Minimum Rating</p>
+      <div id="filterRating" class="flex flex-wrap gap-2"></div>
+    </div>
+  </div>
+  <div class="border-t border-neutral-100 px-5 py-4 flex gap-3">
+    <button id="clearFilters" class="flex-1 border border-neutral-200 text-sm font-semibold py-3 rounded-full hover:bg-neutral-50">Clear All</button>
+    <button id="applyFilters" class="flex-1 bg-[var(--violet)] hover:bg-[var(--violet-dark)] transition text-white text-sm font-semibold py-3 rounded-full">Apply Filters</button>
+  </div>
+</div>
+
+
+<div id="mainContent">
+
+<!-- Hero: banner carousel + side tiles (Jumia style — flat, edge-to-edge, no rounding) -->
+<section class="px-2 md:px-8 pt-3 pb-1">
+  <div class="grid md:grid-cols-3 gap-1.5">
+    <div id="heroCarousel" class="md:col-span-2 relative overflow-hidden h-44 md:h-80" style="background:var(--ink);">
+      <div id="heroSlides" class="absolute inset-0"></div>
+      <button id="heroPrev" class="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white items-center justify-center z-20"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+      <button id="heroNext" class="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white items-center justify-center z-20"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+      <div id="heroDots" class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-20"></div>
+    </div>
+    <div class="hidden md:flex flex-col gap-1.5">
+      <div class="flex-1 relative overflow-hidden" style="background:#DCEBF7;">
+        <img src="https://images.unsplash.com/photo-1583394838336-acd977736f90?q=80&w=500&auto=format&fit=crop" class="absolute right-0 bottom-0 w-28 h-28 object-cover" alt="headphones"/>
+        <div class="p-4">
+          <p class="text-xs font-bold">Sound That<br>Moves You.</p>
+          <button data-nav="flash" class="mt-2 bg-white text-[10px] font-semibold px-2.5 py-1 shadow-sm">Shop Now</button>
+        </div>
+      </div>
+      <div class="flex-1 relative overflow-hidden" style="background:#E7EDCE;">
+        <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=500&auto=format&fit=crop" class="absolute right-0 bottom-0 w-28 h-28 object-cover" alt="camera"/>
+        <div class="p-4">
+          <p class="text-xs font-bold">Capture Every<br>Detail.</p>
+          <button data-nav="flash" class="mt-2 bg-white text-[10px] font-semibold px-2.5 py-1 shadow-sm">Shop Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Categories -->
+<section id="categories" class="px-2 md:px-8 py-4">
+  <div class="scroll-row md:grid md:grid-cols-9 md:gap-2 px-2 md:px-0 -mx-2 md:mx-0" id="cats"></div>
+</section>
+
+<!-- Promo banners -->
+<section class="px-2 md:px-8 grid md:grid-cols-2 gap-1.5 mb-6">
+  <div class="bg-[var(--ink)] p-5 md:p-6 flex flex-col justify-between relative overflow-hidden">
+    <div>
+      <span class="text-[10px] tracking-widest text-neutral-400 font-semibold">LIMITED TIME OFFER</span>
+      <h3 class="text-white text-lg md:text-xl font-bold font-display mt-1 leading-tight">MacBook Air M2<br>Supercharged by M2.</h3>
+      <p class="text-[var(--violet)] font-semibold mt-2 text-sm">Save KSh 26,000</p>
+    </div>
+    <button data-open-product="macbook-air-m2" class="mt-4 bg-white text-black text-xs font-semibold px-4 py-2 w-fit flex items-center gap-1">Shop Now <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+    <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=600&auto=format&fit=crop" class="absolute -right-4 bottom-0 w-32 opacity-90" alt="macbook"/>
+  </div>
+  <div class="p-5 md:p-6 flex flex-col justify-between relative overflow-hidden" style="background:linear-gradient(135deg,#FF7A18,#D9740F);">
+    <div>
+      <span class="text-[10px] tracking-widest text-orange-100 font-semibold">SPECIAL DEAL</span>
+      <h3 class="text-white text-lg md:text-xl font-bold font-display mt-1 leading-tight">Grab Up to 40% Off</h3>
+      <p class="text-orange-100 font-medium mt-2 text-sm">On Selected Items</p>
+    </div>
+    <button data-nav="flash" class="mt-4 bg-white text-[var(--violet)] text-xs font-semibold px-4 py-2 w-fit flex items-center gap-1">Shop Now <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+    <img src="https://images.unsplash.com/photo-1546435770-a3e426bf472b?q=80&w=600&auto=format&fit=crop" class="absolute -right-4 bottom-0 w-32" alt="headphones"/>
+  </div>
+</section>
+
+<!-- Featured Collections -->
+<section class="px-2 md:px-8 mb-6">
+  <div class="flex items-center justify-between mb-2">
+    <h2 class="text-xl font-bold font-display">Featured Collections</h2>
+    <a href="#" class="text-sm font-medium text-neutral-600 flex items-center gap-1 hover:text-[var(--violet)]">View All <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></a>
+  </div>
+  <div id="collections" class="grid grid-cols-2 md:grid-cols-4 gap-1.5"></div>
+</section>
+
+<!-- Flash Deals -->
+<section id="flash" class="px-2 md:px-8 mb-6">
+  <div class="flex items-center justify-between mb-1">
+    <h2 class="text-xl font-bold font-display">Flash Sales <span class="text-[var(--violet)]">| Live Now</span></h2>
+    <a href="#" class="text-sm font-medium text-neutral-600 flex items-center gap-1 hover:text-[var(--violet)]">See All <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></a>
+  </div>
+  <p class="text-xs text-neutral-500 mb-4">Time Left: <span id="countdown" class="font-bold text-[var(--violet)]"></span></p>
+  <div id="flashGrid" class="scroll-row md:grid md:grid-cols-6 md:gap-1.5 px-2 md:px-0 -mx-2 md:mx-0"></div>
+</section>
+
+<!-- New Arrivals -->
+<section id="arrivals" class="px-2 md:px-8 mb-6">
+  <div class="flex items-center justify-between mb-2">
+    <h2 class="text-xl font-bold font-display">New Arrivals</h2>
+    <a href="#" class="text-sm font-medium text-neutral-600 flex items-center gap-1 hover:text-[var(--violet)]">View All <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></a>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-5 gap-1.5">
+    <div data-open-product="airpods-pro-2" class="prod-card col-span-2 row-span-2 p-4 flex flex-col justify-between relative overflow-hidden" style="background:linear-gradient(135deg,#2A1458,#0B0B12);">
+      <div>
+        <span class="text-[10px] tracking-widest text-orange-200 font-semibold">BEST SELLING</span>
+        <h3 class="text-white text-2xl font-bold font-display mt-2 leading-tight">AirPods Pro<br>(2nd Gen)</h3>
+        <p class="text-neutral-300 text-sm mt-1">Active Noise Cancellation</p>
+        <p class="text-white font-bold text-xl mt-3">KSh 32,350</p>
+      </div>
+      <button class="mt-6 bg-white text-black text-sm font-semibold px-5 py-2.5 rounded-full w-fit flex items-center gap-2">Explore Now <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+      <img src="https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?q=80&w=500&auto=format&fit=crop" class="absolute -right-2 bottom-0 w-40 rounded-xl opacity-95" alt="airpods"/>
+    </div>
+    <div id="arrivalsGrid" class="contents"></div>
+  </div>
+</section>
+
+<!-- Best Sellers -->
+<section class="px-2 md:px-8 mb-6">
+  <div class="flex items-center justify-between mb-2">
+    <h2 class="text-xl font-bold font-display">Best Sellers</h2>
+    <a href="#" class="text-sm font-medium text-neutral-600 flex items-center gap-1 hover:text-[var(--violet)]">View All <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></a>
+  </div>
+  <div id="bestsellers" class="bg-[var(--ink)] grid grid-cols-2 md:grid-cols-5 divide-x divide-white/10"></div>
+</section>
+
+<!-- Trust badges -->
+<section class="px-4 md:px-8 py-10 border-t border-neutral-100 grid grid-cols-2 md:grid-cols-6 gap-6 text-center">
+  <div class="flex flex-col items-center gap-2"><i data-lucide="shield-check" class="w-6 h-6 text-[var(--violet)]"></i><p class="text-sm font-semibold">100% Secure Payments</p><p class="text-xs text-neutral-500">Your payment information is safe with us.</p></div>
+  <div class="flex flex-col items-center gap-2"><i data-lucide="truck" class="w-6 h-6 text-[var(--violet)]"></i><p class="text-sm font-semibold">Fast &amp; Free Delivery</p><p class="text-xs text-neutral-500">Free shipping on orders over KSh 5,000.</p></div>
+  <div class="flex flex-col items-center gap-2"><i data-lucide="rotate-ccw" class="w-6 h-6 text-[var(--violet)]"></i><p class="text-sm font-semibold">30-Day Easy Returns</p><p class="text-xs text-neutral-500">Not satisfied? Return within 30 days.</p></div>
+  <div class="flex flex-col items-center gap-2"><i data-lucide="headphones" class="w-6 h-6 text-[var(--violet)]"></i><p class="text-sm font-semibold">24/7 Customer Support</p><p class="text-xs text-neutral-500">We're here to help you anytime.</p></div>
+  <div class="flex flex-col items-center gap-2"><i data-lucide="badge-check" class="w-6 h-6 text-[var(--violet)]"></i><p class="text-sm font-semibold">Official Warranty</p><p class="text-xs text-neutral-500">All products come with warranty.</p></div>
+  <div class="flex flex-col items-center gap-2"><i data-lucide="wallet" class="w-6 h-6 text-[var(--violet)]"></i><p class="text-sm font-semibold">Pay on Delivery</p><p class="text-xs text-neutral-500">M-Pesa, Airtel Money or cash at your door.</p></div>
+</section>
+
+<!-- App download -->
+<section class="mx-4 md:mx-8 mb-12 rounded-2xl p-8 md:p-10 grid md:grid-cols-3 items-center gap-6" style="background:linear-gradient(120deg,#F4F0FF,#EAF2FB);">
+  <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=400&auto=format&fit=crop" class="w-28 mx-auto rounded-2xl shadow-lg hidden md:block" alt="app"/>
+  <div class="md:col-span-1">
+    <h3 class="text-xl font-bold font-display mb-2">Shop Smarter with Thomex App</h3>
+    <p class="text-sm text-neutral-600 mb-3">Exclusive deals, early access &amp; faster checkout. Available now on iOS &amp; Android.</p>
+    <div class="flex gap-3">
+      <div class="bg-black text-white text-xs px-3 py-2 rounded-lg flex items-center gap-1"><i data-lucide="apple" class="w-4 h-4"></i> App Store</div>
+      <div class="bg-black text-white text-xs px-3 py-2 rounded-lg flex items-center gap-1"><i data-lucide="play" class="w-4 h-4"></i> Google Play</div>
+    </div>
+  </div>
+  <div class="flex items-center justify-between md:justify-end gap-8">
+    <ul class="text-sm space-y-1.5 text-neutral-700">
+      <li class="flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-[var(--violet)]"></i>Exclusive App Deals</li>
+      <li class="flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-[var(--violet)]"></i>Faster &amp; Secure Checkout</li>
+      <li class="flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-[var(--violet)]"></i>Order Tracking in App</li>
+      <li class="flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-[var(--violet)]"></i>Easy Returns &amp; Support</li>
+    </ul>
+  </div>
+</section>
+
+<!-- Newsletter -->
+<section class="px-4 md:px-8 mb-12 grid md:grid-cols-2 gap-5">
+  <div class="rounded-2xl p-6 flex items-center gap-4" style="background:#FFF3E6;">
+    <img src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=100&auto=format&fit=crop" class="w-12 h-12 rounded-full object-cover" alt="avatar"/>
+    <div>
+      <h4 class="font-bold font-display">Join Thomex Club</h4>
+      <p class="text-xs text-neutral-600">Your one-stop destination for the latest tech gadgets, quality products, best prices, and exceptional customer service.</p>
+    </div>
+  </div>
+  <div class="rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4" style="background:var(--ink);">
+    <div class="text-white">
+      <h4 class="font-bold font-display">Join Thomex Club</h4>
+      <p class="text-xs text-neutral-400">Get exclusive deals, early access to new arrivals and personalized offers.</p>
+    </div>
+    <div class="flex bg-white rounded-full overflow-hidden w-full md:w-64">
+      <input type="text" placeholder="Enter your email address" class="flex-1 px-4 text-sm outline-none"/>
+      <button class="bg-[var(--violet)] text-white text-xs font-semibold px-4 py-2.5">Subscribe</button>
+    </div>
+  </div>
+</section>
+
+<!-- Stats bar -->
+<section class="px-4 md:px-8 mb-12 grid grid-cols-3 gap-4 text-center">
+  <div><p class="text-2xl font-bold font-display text-[var(--violet)]">250K+</p><p class="text-xs text-neutral-500">Happy Customers</p></div>
+  <div><p class="text-2xl font-bold font-display text-[var(--violet)]">1000+</p><p class="text-xs text-neutral-500">Top Brands</p></div>
+  <div><p class="text-2xl font-bold font-display text-[var(--violet)]">99%</p><p class="text-xs text-neutral-500">Satisfaction Rate</p></div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-[var(--ink)] text-neutral-400 px-4 md:px-8 pt-12 pb-6">
+  <div class="grid grid-cols-2 md:grid-cols-6 gap-8 pb-8 border-b border-white/10">
+    <div class="col-span-2">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-7 h-7 rounded-lg brand-grad flex items-center justify-center"><i data-lucide="zap" class="w-4 h-4 text-white"></i></div>
+        <span class="text-white font-bold font-display">Thomex</span>
+      </div>
+      <p class="text-xs">Your one-stop destination for the latest tech gadgets. Quality products, best prices, and exceptional support.</p>
+    </div>
+    <div><h5 class="text-white text-sm font-semibold mb-3">Shop</h5><ul class="text-xs space-y-2"><li>Smartphones</li><li>Laptops</li><li>Audio</li><li>Accessories</li></ul></div>
+    <div><h5 class="text-white text-sm font-semibold mb-3">Customer Service</h5><ul class="text-xs space-y-2"><li>Track Order</li><li>Returns</li><li>Shipping Info</li><li>FAQ</li></ul></div>
+    <div><h5 class="text-white text-sm font-semibold mb-3">Company</h5><ul class="text-xs space-y-2"><li>About Us</li><li>Careers</li><li>Blog</li><li>Contact</li></ul></div>
+    <div><h5 class="text-white text-sm font-semibold mb-3">Legal</h5><ul class="text-xs space-y-2"><li>Terms &amp; Conditions</li><li>Privacy Policy</li><li>Refund Policy</li></ul></div>
+  </div>
+  <div class="flex flex-col md:flex-row items-center justify-between pt-6 text-xs gap-4">
+    <p>© 2026 Thomex. All rights reserved.</p>
+    <div class="flex items-center gap-2 flex-wrap justify-center">
+      <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded font-semibold">M-Pesa</span>
+      <span class="bg-red-500/20 text-red-400 px-3 py-1 rounded font-semibold">Airtel Money</span>
+      <span class="bg-white/10 px-3 py-1 rounded">Pay on Delivery</span>
+      <span class="bg-white/10 px-3 py-1 rounded">VISA</span>
+      <span class="bg-white/10 px-3 py-1 rounded">Mastercard</span>
+    </div>
+  </div>
+</footer>
+
+</div><!-- /mainContent -->
+
+<!-- MOBILE BOTTOM NAV (Jumia style) -->
+<nav class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-neutral-100 flex items-stretch justify-between px-1 pb-[env(safe-area-inset-bottom)]">
+  <button data-bottomnav="home" class="bottomnav-btn flex-1 flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium text-neutral-500">
+    <i data-lucide="home" class="w-5 h-5"></i>Home
+  </button>
+  <button data-bottomnav="categories" class="bottomnav-btn flex-1 flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium text-neutral-500">
+    <i data-lucide="layout-grid" class="w-5 h-5"></i>Categories
+  </button>
+  <button data-bottomnav="cart" class="bottomnav-btn relative flex-1 flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium text-neutral-500">
+    <i data-lucide="shopping-cart" class="w-5 h-5"></i>Cart
+    <span id="cartCountMobile" class="hidden absolute top-0.5 right-6 w-4 h-4 rounded-full bg-[var(--violet)] text-white text-[9px] flex items-center justify-center">0</span>
+  </button>
+  <button data-bottomnav="account" class="bottomnav-btn flex-1 flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium text-neutral-500">
+    <i data-lucide="user" class="w-5 h-5"></i>Account
+  </button>
+</nav>
+
+<!-- CART DRAWER -->
+<div id="cartOverlay" class="hidden fixed inset-0 bg-black/50 z-50 fade opacity-0"></div>
+<div id="cartDrawer" class="fixed top-0 right-0 h-full w-full max-w-sm bg-white z-50 drawer translate-x-full flex flex-col shadow-2xl">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-neutral-100">
+    <h3 class="font-bold font-display text-lg">Your Cart</h3>
+    <button id="closeCart" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-neutral-100"><i data-lucide="x" class="w-5 h-5"></i></button>
+  </div>
+  <div id="cartItems" class="flex-1 overflow-y-auto px-5 py-4 space-y-4"></div>
+  <div id="cartEmpty" class="hidden flex-1 flex flex-col items-center justify-center text-neutral-400 gap-3 px-5">
+    <i data-lucide="shopping-cart" class="w-10 h-10"></i>
+    <p class="text-sm">Your cart is empty</p>
+  </div>
+  <div class="border-t border-neutral-100 px-5 py-4">
+    <div class="flex items-center justify-between mb-3 text-sm">
+      <span class="text-neutral-500">Subtotal</span>
+      <span id="cartSubtotal" class="font-bold text-lg">KSh 0</span>
+    </div>
+    <button id="checkoutBtn" class="w-full bg-[var(--violet)] hover:bg-[var(--violet-dark)] transition text-white font-semibold py-3 rounded-full">Checkout</button>
+  </div>
+</div>
+
+<!-- PRODUCT DETAIL MODAL -->
+<div id="productOverlay" class="hidden fixed inset-0 bg-black/50 z-50 fade opacity-0 flex items-center justify-center p-4">
+  <div id="productModal" class="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto relative">
+    <button id="closeProduct" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white shadow flex items-center justify-center z-10 hover:bg-neutral-100"><i data-lucide="x" class="w-5 h-5"></i></button>
+    <div id="productModalBody" class="grid md:grid-cols-2 gap-0"></div>
+  </div>
+</div>
+
+<!-- ACCOUNT MODAL -->
+<div id="accountOverlay" class="hidden fixed inset-0 bg-black/50 z-50 fade opacity-0 flex items-center justify-center p-4">
+  <div class="bg-white max-w-sm w-full rounded-xl overflow-hidden relative">
+    <button id="closeAccount" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center z-10 hover:bg-neutral-200"><i data-lucide="x" class="w-4 h-4"></i></button>
+    <div id="accountModalBody" class="p-6"></div>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div id="checkoutOverlay" class="hidden fixed inset-0 bg-black/50 z-50 fade opacity-0 flex items-center justify-center p-4">
+  <div class="bg-white max-w-lg w-full rounded-xl overflow-y-auto max-h-[90vh] relative">
+    <button id="closeCheckout" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center z-10 hover:bg-neutral-200"><i data-lucide="x" class="w-4 h-4"></i></button>
+    <div id="checkoutModalBody" class="p-6"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-[var(--ink)] text-white text-sm font-medium px-5 py-3 rounded-full shadow-xl z-[60] items-center gap-2">
+  <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i><span id="toastText">Added to cart</span>
+</div>
+
+
+<script src="js/data.js"></script>
+<script src="js/render.js"></script>
+<script src="js/search.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/product-modal.js"></script>
+<script src="js/account.js"></script>
+<script src="js/checkout.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
