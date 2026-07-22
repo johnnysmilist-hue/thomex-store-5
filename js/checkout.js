@@ -90,4 +90,3 @@ function renderOrderConfirmation(orderId, payment, total){
 document.getElementById('checkoutBtn').addEventListener('click', openCheckout);
 document.getElementById('closeCheckout').addEventListener('click', closeCheckoutModal);
 document.getElementById('checkoutOverlay').addEventListener('click', e=>{ if(e.target.id==='checkoutOverlay') closeCheckoutModal(); });
-

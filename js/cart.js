@@ -89,4 +89,3 @@ function closeCart(){
 document.getElementById('cartBtn').addEventListener('click', openCart);
 document.getElementById('closeCart').addEventListener('click', closeCart);
 document.getElementById('cartOverlay').addEventListener('click', e=>{ if(e.target.id==='cartOverlay') closeCart(); });
-

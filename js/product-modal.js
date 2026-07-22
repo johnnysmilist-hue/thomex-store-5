@@ -76,4 +76,3 @@ function showToast(text){
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=>{ t.classList.add('hidden'); t.classList.remove('flex'); }, 2200);
 }
-

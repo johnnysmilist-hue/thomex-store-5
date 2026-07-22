@@ -232,4 +232,3 @@ function runSearchWishlist(){
   lucide.createIcons();
   window.scrollTo({top:0, behavior:'smooth'});
 }
-

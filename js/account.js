@@ -74,4 +74,3 @@ function renderAccountModal(){
 document.getElementById('accountBtn')?.addEventListener('click', openAccountModal);
 document.getElementById('closeAccount').addEventListener('click', closeAccountModal);
 document.getElementById('accountOverlay').addEventListener('click', e=>{ if(e.target.id==='accountOverlay') closeAccountModal(); });
-

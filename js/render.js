@@ -24,15 +24,27 @@ function productCard(p, opts={}){
   </div>`;
 }
 
+const CIRCLE_BG = ['#FFF3E0','#E8F5E9','#E3F2FD','#FCE4EC','#FFFDE7','#EDE7F6'];
+
 function renderAll(){
-  document.getElementById('cats').innerHTML = CATS.map(c=>`
-    <div data-filter-cat="${c.category}" class="prod-card w-16 md:w-auto shrink-0 flex flex-col items-center justify-center gap-1 p-2 border border-neutral-200 hover:border-[var(--violet)] transition text-center">
-      <i data-lucide="${c.icon}" class="w-5 h-5 text-neutral-700"></i>
-      <p class="text-[10px] font-medium leading-tight">${c.name}</p>
-    </div>`).join('') + `
-    <div class="w-16 md:w-auto shrink-0 flex flex-col items-center justify-center gap-1 p-2 bg-[var(--ink)] text-white cursor-pointer text-center">
-      <i data-lucide="layout-grid" class="w-5 h-5"></i><p class="text-[9px] font-medium">View All</p>
-    </div>`;
+  const sidebar = document.getElementById('sidebarCats');
+  if(sidebar){
+    sidebar.innerHTML = CATS.map(c=>`
+      <button data-filter-cat="${c.category}" class="w-full flex items-center gap-2.5 px-3 py-2.5 text-left text-xs font-medium text-neutral-700 hover:bg-neutral-50 hover:text-[var(--violet)] border-b border-neutral-100 last:border-0">
+        <i data-lucide="${c.icon}" class="w-4 h-4 shrink-0"></i> ${c.name}
+      </button>`).join('');
+  }
+
+  const circleCats = document.getElementById('circleCats');
+  if(circleCats){
+    circleCats.innerHTML = CATS.map((c,i)=>`
+      <div data-filter-cat="${c.category}" class="prod-card w-20 md:w-auto shrink-0 flex flex-col items-center gap-1.5 text-center">
+        <div class="w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center" style="background:${CIRCLE_BG[i % CIRCLE_BG.length]}">
+          <i data-lucide="${c.icon}" class="w-6 h-6 text-neutral-700"></i>
+        </div>
+        <p class="text-[10px] font-medium leading-tight">${c.name}</p>
+      </div>`).join('');
+  }
 
   const catStrip = document.getElementById('catStripLinks');
   if(catStrip){
@@ -76,6 +88,32 @@ function renderAll(){
     </div>`;
   }).join('');
 
+  renderDealRows();
   lucide.createIcons();
 }
 
+function dealRow(title, ids){
+  return `
+  <section class="px-2 md:px-8 mb-6">
+    <div class="bg-[var(--violet)] text-white flex items-center justify-between px-3 py-2">
+      <h3 class="text-sm font-bold">${title}</h3>
+      <a href="#" class="text-xs font-semibold flex items-center gap-1 hover:underline">See All <i data-lucide="arrow-right" class="w-3 h-3"></i></a>
+    </div>
+    <div class="scroll-row md:grid md:grid-cols-6 md:gap-1.5 px-0 border border-t-0 border-neutral-200">
+      ${ids.map(id=>productCard(byId(id), {scroll:true})).join('')}
+    </div>
+  </section>`;
+}
+
+function renderDealRows(){
+  const el = document.getElementById('dealRows');
+  if(!el) return;
+  const audioIds = PRODUCTS.filter(p=>p.category==='Audio').map(p=>p.id);
+  const clearanceIds = PRODUCTS.filter(p=>p.old).map(p=>p.id);
+  const officialIds = PRODUCTS.filter(p=>p.official).map(p=>p.id);
+  el.innerHTML =
+    dealRow('Audio Deals', audioIds.length?audioIds:FLASH_IDS) +
+    dealRow('Clearance Sale', clearanceIds.length?clearanceIds:ARRIVAL_IDS) +
+    dealRow('Deals From Official Stores', officialIds.length?officialIds:BESTSELLER_IDS);
+  lucide.createIcons();
+}

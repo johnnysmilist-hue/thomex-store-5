@@ -37,14 +37,10 @@ resetHeroTimer();
 
 /* ---------------- COUNTDOWN ---------------- */
 function pad(n){return n.toString().padStart(2,'0');}
-let remaining = 3*3600 + 31*60 + 31;
+let remaining = 1*86400 + 1*3600 + 34*60;
 function tick(){
-  const h=Math.floor(remaining/3600), m=Math.floor((remaining%3600)/60), s=remaining%60;
-  document.getElementById('countdown').textContent = `${pad(h)}h : ${pad(m)}m : ${pad(s)}s`;
-  if(remaining>0) remaining--;
+  const d=Math.floor(remaining/86400), h=Math.floor((remaining%86400)/3600), m=Math.floor((remaining%3600)/60);
+  document.getElementById('countdown').textContent = `${pad(d)}d:${pad(h)}h:${pad(m)}m`;
+  if(remaining>0) remaining -= 60;
 }
-tick(); setInterval(tick, 1000);
-
-/* ---------------- INIT ---------------- */
-renderAll();
-renderCart();
+tick(); setInterval(tick, 60000);

@@ -47,4 +47,3 @@ let cart = {};      // id -> qty
 let wishlist = new Set();
 const byId = id => PRODUCTS.find(p => p.id === id);
 function formatPrice(n){ return 'KSh ' + Math.round(n).toLocaleString('en-KE'); }
-
