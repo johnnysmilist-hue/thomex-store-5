@@ -1,0 +1,46 @@
+.admin-nav-item.active{
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  box-shadow: inset 3px 0 0 var(--violet);
+}
+.admin-table th{
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #6b7280;
+  font-weight: 600;
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.admin-table td{
+  padding: 10px 12px;
+  border-bottom: 1px solid #f0f0f1;
+  font-size: 13px;
+  vertical-align: middle;
+}
+.admin-table tr:hover td{
+  background: #f9fafb;
+}
+.admin-card{
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+}
+.admin-stat-value{
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+.status-pill{
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.status-pending{ background:#FEF3C7; color:#92400E; }
+.status-processing{ background:#DBEAFE; color:#1E40AF; }
+.status-shipped{ background:#E0E7FF; color:#3730A3; }
+.status-delivered{ background:#D1FAE5; color:#065F46; }
