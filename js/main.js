@@ -44,3 +44,7 @@ function tick(){
   if(remaining>0) remaining -= 60;
 }
 tick(); setInterval(tick, 60000);
+
+/* ---------------- INIT ---------------- */
+renderAll();
+renderCart();

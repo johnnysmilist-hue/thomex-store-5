@@ -61,10 +61,10 @@ function renderAll(){
   }
 
   document.getElementById('collections').innerHTML = COLLECTIONS.map(c=>`
-    <div class="border border-neutral-200 p-3 hover:shadow-md transition">
+    <div data-collection="${c.brand?('brand:'+c.brand):('cat:'+c.category)}" class="prod-card border border-neutral-200 p-3 hover:shadow-md transition">
       <img src="${c.img}" class="w-full h-24 object-cover mb-2" alt="${c.name}"/>
       <h4 class="font-bold text-sm font-display">${c.name}</h4>
-      <a href="#" class="text-xs text-[var(--violet)] font-semibold flex items-center gap-1 mt-1">${c.tag} <i data-lucide="arrow-right" class="w-3 h-3"></i></a>
+      <span class="text-xs text-[var(--violet)] font-semibold flex items-center gap-1 mt-1">${c.tag} <i data-lucide="arrow-right" class="w-3 h-3"></i></span>
     </div>`).join('');
 
   document.getElementById('flashGrid').innerHTML = FLASH_IDS.map(id=>productCard(byId(id), {scroll:true, showStock:true})).join('');
@@ -92,12 +92,14 @@ function renderAll(){
   lucide.createIcons();
 }
 
-function dealRow(title, ids){
+const DEAL_ROW_IDS = {};
+function dealRow(key, title, ids){
+  DEAL_ROW_IDS[key] = ids;
   return `
   <section class="px-2 md:px-8 mb-6">
     <div class="bg-[var(--violet)] text-white flex items-center justify-between px-3 py-2">
       <h3 class="text-sm font-bold">${title}</h3>
-      <a href="#" class="text-xs font-semibold flex items-center gap-1 hover:underline">See All <i data-lucide="arrow-right" class="w-3 h-3"></i></a>
+      <a href="#" data-view-all-key="${key}" class="text-xs font-semibold flex items-center gap-1 hover:underline">See All <i data-lucide="arrow-right" class="w-3 h-3"></i></a>
     </div>
     <div class="scroll-row md:grid md:grid-cols-6 md:gap-1.5 px-0 border border-t-0 border-neutral-200">
       ${ids.map(id=>productCard(byId(id), {scroll:true})).join('')}
@@ -112,8 +114,8 @@ function renderDealRows(){
   const clearanceIds = PRODUCTS.filter(p=>p.old).map(p=>p.id);
   const officialIds = PRODUCTS.filter(p=>p.official).map(p=>p.id);
   el.innerHTML =
-    dealRow('Audio Deals', audioIds.length?audioIds:FLASH_IDS) +
-    dealRow('Clearance Sale', clearanceIds.length?clearanceIds:ARRIVAL_IDS) +
-    dealRow('Deals From Official Stores', officialIds.length?officialIds:BESTSELLER_IDS);
+    dealRow('audio', 'Audio Deals', audioIds.length?audioIds:FLASH_IDS) +
+    dealRow('clearance', 'Clearance Sale', clearanceIds.length?clearanceIds:ARRIVAL_IDS) +
+    dealRow('official', 'Deals From Official Stores', officialIds.length?officialIds:BESTSELLER_IDS);
   lucide.createIcons();
 }

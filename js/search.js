@@ -172,6 +172,56 @@ document.addEventListener('click', e=>{
   }
 });
 
+/* Generic "show a fixed list of products" view — used by View All / See All / collection links */
+function showProductList(title, ids){
+  document.getElementById('mainContent').classList.add('hidden');
+  document.getElementById('searchResults').classList.remove('hidden');
+  document.getElementById('searchResultsTitle').textContent = title;
+  const grid = document.getElementById('searchResultsGrid');
+  const empty = document.getElementById('searchEmpty');
+  const items = ids.map(id=>byId(id)).filter(Boolean);
+  if(items.length === 0){ grid.innerHTML=''; empty.textContent='No products in this list yet.'; empty.classList.remove('hidden'); }
+  else { empty.classList.add('hidden'); grid.innerHTML = items.map(p=>productCard(p)).join(''); }
+  document.getElementById('filterDrawer')?.classList.add('translate-x-full');
+  lucide.createIcons();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+document.addEventListener('click', e=>{
+  const viewAll = e.target.closest('[data-view-all]');
+  if(viewAll){
+    e.preventDefault();
+    const key = viewAll.dataset.viewAll;
+    const map = { collections: ['macbook-air-m2','ipad-air','dji-mini-3','mx-master-3s'], flash: FLASH_IDS, arrivals: ARRIVAL_IDS, bestsellers: BESTSELLER_IDS };
+    const titles = { collections:'Featured Collections', flash:'Flash Sales', arrivals:'New Arrivals', bestsellers:'Best Sellers' };
+    showProductList(titles[key], map[key] || []);
+    return;
+  }
+  const viewAllKey = e.target.closest('[data-view-all-key]');
+  if(viewAllKey){
+    e.preventDefault();
+    const key = viewAllKey.dataset.viewAllKey;
+    const titleEl = viewAllKey.closest('section')?.querySelector('h3');
+    showProductList(titleEl ? titleEl.textContent : 'Deals', DEAL_ROW_IDS[key] || []);
+    return;
+  }
+  const collectionEl = e.target.closest('[data-collection]');
+  if(collectionEl){
+    const [type, value] = collectionEl.dataset.collection.split(':');
+    if(type === 'brand') showProductList(value + ' Collection', PRODUCTS.filter(p=>p.brand===value).map(p=>p.id));
+    else runSearch('', value);
+    return;
+  }
+  const social = e.target.closest('[data-social]');
+  if(social){ e.preventDefault(); showToast(`${social.dataset.social} — coming soon`); return; }
+  const info = e.target.closest('[data-info]');
+  if(info){
+    if(info.dataset.info === 'sell') showToast('Seller sign-up — coming soon');
+    else if(info.dataset.info === 'help') showToast('Need help? Email support@thomex.co.ke');
+    return;
+  }
+});
+
 /* Categories mega-menu (desktop) */
 document.getElementById('categoriesNavBtn')?.addEventListener('click', e=>{
   e.stopPropagation();

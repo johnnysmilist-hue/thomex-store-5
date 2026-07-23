@@ -32,10 +32,10 @@ const CATS = [
 ];
 
 const COLLECTIONS = [
-  {name:'Apple Collection', tag:'Explore Now', img:'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?q=80&w=400&auto=format&fit=crop'},
-  {name:'Gaming Zone', tag:'Level Up Your Game', img:'https://images.unsplash.com/photo-1592840062661-a5a7f78e2056?q=80&w=400&auto=format&fit=crop'},
-  {name:'Smart Living', tag:'Innovate Your Home', img:'https://images.unsplash.com/photo-1558089687-f282ffcbc126?q=80&w=400&auto=format&fit=crop'},
-  {name:'Work From Home', tag:'Essentials for Productivity', img:'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=400&auto=format&fit=crop'},
+  {name:'Apple Collection', tag:'Explore Now', brand:'Apple', img:'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?q=80&w=400&auto=format&fit=crop'},
+  {name:'Gaming Zone', tag:'Level Up Your Game', category:'Gaming', img:'https://images.unsplash.com/photo-1592840062661-a5a7f78e2056?q=80&w=400&auto=format&fit=crop'},
+  {name:'Smart Living', tag:'Innovate Your Home', category:'Smartwatches', img:'https://images.unsplash.com/photo-1558089687-f282ffcbc126?q=80&w=400&auto=format&fit=crop'},
+  {name:'Work From Home', tag:'Essentials for Productivity', category:'Laptops', img:'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=400&auto=format&fit=crop'},
 ];
 
 const BESTSELLER_IDS = ['iphone-15-pro-max','macbook-air-m2','galaxy-watch-6','sony-wh1000xm4','canon-eos-r6'];
