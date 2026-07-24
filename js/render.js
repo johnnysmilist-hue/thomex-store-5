@@ -5,22 +5,32 @@ function stars(rating){
 }
 
 function priceHtml(p){
-  return `<p class="text-sm font-bold">${formatPrice(p.price)}</p>${p.old ? `<p class="text-[10px] text-neutral-400 line-through">${formatPrice(p.old)}</p>` : ''}`;
+  return `<p class="text-sm font-bold text-[var(--red)]">${formatPrice(p.price)}</p>${p.old ? `<p class="text-[10px] text-neutral-400 line-through">${formatPrice(p.old)}</p>` : ''}`;
+}
+
+function offLabel(p){
+  if(p.off) return p.off;
+  if(p.old && p.old > p.price){
+    const pct = Math.round((1 - p.price/p.old) * 100);
+    if(pct > 0) return `-${pct}%`;
+  }
+  return null;
 }
 
 function productCard(p, opts={}){
-  const widthCls = opts.scroll ? 'w-32 md:w-auto shrink-0' : '';
+  const widthCls = opts.scroll ? 'w-28 md:w-auto shrink-0' : '';
+  const off = offLabel(p);
   return `
-  <div class="prod-card ${widthCls} border border-neutral-200 p-2 hover:shadow-sm transition relative bg-white" data-open-product="${p.id}">
-    ${p.off ? `<span class="absolute top-1.5 left-1.5 bg-[var(--violet)] text-white text-[10px] font-bold px-1.5 py-0.5 z-10">${p.off}</span>` : (p.badge ? `<span class="absolute top-1.5 left-1.5 bg-neutral-800 text-white text-[9px] font-bold px-1.5 py-0.5 z-10">${p.badge}</span>` : '')}
+  <div class="prod-card ${widthCls} border border-neutral-200 p-1.5 hover:shadow-md transition relative bg-white" data-open-product="${p.id}">
+    ${off ? `<span class="discount-ribbon absolute top-1 left-1 text-white text-[10px] font-bold px-1.5 py-0.5 z-10 rounded-sm">${off}</span>` : (p.badge ? `<span class="absolute top-1 left-1 bg-neutral-800 text-white text-[9px] font-bold px-1.5 py-0.5 z-10 rounded-sm">${p.badge}</span>` : '')}
     <button data-wish="${p.id}" class="absolute top-1 right-1 w-6 h-6 flex items-center justify-center z-10"><i data-lucide="heart" class="w-3.5 h-3.5 ${wishlist.has(p.id)?'text-red-500 fill-red-500':'text-neutral-300'}"></i></button>
-    <img src="${p.img}" class="w-full h-24 md:h-32 object-contain mb-1.5" alt="${p.name}"/>
+    <img src="${p.img}" class="w-full h-20 md:h-32 object-contain mb-1" alt="${p.name}"/>
     ${p.official ? `<span class="inline-flex items-center gap-0.5 text-[9px] font-bold text-blue-600 mb-0.5"><i data-lucide="badge-check" class="w-3 h-3"></i>Official Store</span>` : ''}
-    <p class="text-xs text-neutral-700 leading-tight line-clamp-2 min-h-[2.2em]">${p.name}</p>
-    <div class="mt-1">${priceHtml(p)}</div>
+    <p class="text-[11px] md:text-xs text-neutral-700 leading-tight line-clamp-2 min-h-[2.2em]">${p.name}</p>
+    <div class="mt-1 flex items-baseline gap-1">${priceHtml(p)}</div>
     <p class="text-[10px] star mt-0.5">${stars(p.rating)} <span class="text-neutral-400">(${p.reviews})</span></p>
-    <button data-add="${p.id}" class="absolute bottom-2 right-2 w-6 h-6 flex items-center justify-center text-[var(--violet)] hover:bg-orange-50"><i data-lucide="shopping-cart" class="w-4 h-4"></i></button>
-    ${opts.showStock ? `<div class="mt-1.5 h-1 bg-neutral-100 overflow-hidden"><div class="h-full bg-[var(--violet)]" style="width:${Math.min(100, p.stock)}%"></div></div><p class="text-[10px] text-neutral-400 mt-0.5">${p.stock} items left</p>` : ''}
+    <button data-add="${p.id}" class="absolute bottom-1.5 right-1.5 w-6 h-6 flex items-center justify-center text-[var(--violet)] hover:bg-orange-50 rounded-full"><i data-lucide="shopping-cart" class="w-4 h-4"></i></button>
+    ${opts.showStock ? `<div class="mt-1.5 h-1 bg-neutral-100 overflow-hidden"><div class="h-full bg-[var(--red)]" style="width:${Math.min(100, p.stock)}%"></div></div><p class="text-[10px] text-neutral-400 mt-0.5">${p.stock} items left</p>` : ''}
   </div>`;
 }
 
@@ -43,6 +53,17 @@ function renderAll(){
           <i data-lucide="${c.icon}" class="w-6 h-6 text-neutral-700"></i>
         </div>
         <p class="text-[10px] font-medium leading-tight">${c.name}</p>
+      </div>`).join('');
+  }
+
+  const hotCats = document.getElementById('hotCatsGrid');
+  if(hotCats){
+    hotCats.innerHTML = CATS.map((c,i)=>`
+      <div data-filter-cat="${c.category}" class="hotcat-tile prod-card flex flex-col items-center gap-1 text-center p-2 rounded-lg">
+        <div class="w-9 h-9 md:w-11 md:h-11 rounded-full flex items-center justify-center" style="background:${CIRCLE_BG[i % CIRCLE_BG.length]}">
+          <i data-lucide="${c.icon}" class="w-4 h-4 md:w-5 md:h-5 text-[var(--violet)]"></i>
+        </div>
+        <p class="text-[9px] md:text-[10px] font-medium leading-tight">${c.name}</p>
       </div>`).join('');
   }
 
@@ -93,11 +114,12 @@ function renderAll(){
 }
 
 const DEAL_ROW_IDS = {};
-function dealRow(key, title, ids){
+function dealRow(key, title, ids, color='violet'){
   DEAL_ROW_IDS[key] = ids;
+  const bg = color==='red' ? 'background:var(--red);' : 'background:var(--violet);';
   return `
   <section class="px-2 md:px-8 mb-6">
-    <div class="bg-[var(--violet)] text-white flex items-center justify-between px-3 py-2">
+    <div class="text-white flex items-center justify-between px-3 py-2" style="${bg}">
       <h3 class="text-sm font-bold">${title}</h3>
       <a href="#" data-view-all-key="${key}" class="text-xs font-semibold flex items-center gap-1 hover:underline">See All <i data-lucide="arrow-right" class="w-3 h-3"></i></a>
     </div>
@@ -114,8 +136,8 @@ function renderDealRows(){
   const clearanceIds = PRODUCTS.filter(p=>p.old).map(p=>p.id);
   const officialIds = PRODUCTS.filter(p=>p.official).map(p=>p.id);
   el.innerHTML =
-    dealRow('audio', 'Audio Deals', audioIds.length?audioIds:FLASH_IDS) +
-    dealRow('clearance', 'Clearance Sale', clearanceIds.length?clearanceIds:ARRIVAL_IDS) +
-    dealRow('official', 'Deals From Official Stores', officialIds.length?officialIds:BESTSELLER_IDS);
+    dealRow('audio', 'Audio Deals', audioIds.length?audioIds:FLASH_IDS, 'violet') +
+    dealRow('clearance', 'Clearance Sale', clearanceIds.length?clearanceIds:ARRIVAL_IDS, 'red') +
+    dealRow('official', 'Deals From Official Stores', officialIds.length?officialIds:BESTSELLER_IDS, 'violet');
   lucide.createIcons();
 }

@@ -40,7 +40,10 @@ function pad(n){return n.toString().padStart(2,'0');}
 let remaining = 1*86400 + 1*3600 + 34*60;
 function tick(){
   const d=Math.floor(remaining/86400), h=Math.floor((remaining%86400)/3600), m=Math.floor((remaining%3600)/60);
-  document.getElementById('countdown').textContent = `${pad(d)}d:${pad(h)}h:${pad(m)}m`;
+  const days=document.getElementById('cdDays'), hours=document.getElementById('cdHours'), mins=document.getElementById('cdMins');
+  if(days) days.textContent = pad(d);
+  if(hours) hours.textContent = pad(h);
+  if(mins) mins.textContent = pad(m);
   if(remaining>0) remaining -= 60;
 }
 tick(); setInterval(tick, 60000);
