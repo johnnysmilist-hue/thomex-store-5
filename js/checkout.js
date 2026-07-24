@@ -2,7 +2,6 @@
 function openCheckout(){
   if(Object.keys(cart).length === 0){ showToast('Your cart is empty'); return; }
   renderCheckout();
-  closeCart();
   document.getElementById('checkoutOverlay').classList.remove('hidden');
   requestAnimationFrame(()=>document.getElementById('checkoutOverlay').classList.remove('opacity-0'));
 }
@@ -14,42 +13,54 @@ function closeCheckoutModal(){
 function renderCheckout(){
   const body = document.getElementById('checkoutModalBody');
   const ids = Object.keys(cart);
+  const itemCount = ids.reduce((s,id)=>s+cart[id],0);
   const subtotal = ids.reduce((s,id)=>s+byId(id).price*cart[id],0);
   const deliveryFee = subtotal > 0 ? 200 : 0;
   const total = subtotal + deliveryFee;
 
   body.innerHTML = `
-    <h3 class="font-bold font-display text-lg mb-4">Checkout</h3>
-    <form id="checkoutForm" class="space-y-3">
-      <p class="text-xs font-bold uppercase tracking-wide text-neutral-400">Delivery Details</p>
-      <input required name="fullName" value="${currentUser?currentUser.name:''}" placeholder="Full Name" class="w-full border border-neutral-200 rounded px-3 py-2 text-sm outline-none focus:border-[var(--violet)]"/>
-      <input required name="phone" placeholder="Phone Number (e.g. 07XX XXX XXX)" class="w-full border border-neutral-200 rounded px-3 py-2 text-sm outline-none focus:border-[var(--violet)]"/>
-      <input required name="address" placeholder="Delivery Address" class="w-full border border-neutral-200 rounded px-3 py-2 text-sm outline-none focus:border-[var(--violet)]"/>
-      <input required name="city" placeholder="Town / City" class="w-full border border-neutral-200 rounded px-3 py-2 text-sm outline-none focus:border-[var(--violet)]"/>
+    <h3 class="font-bold font-display text-lg mb-1">Place Your Order</h3>
+    <p class="text-xs text-neutral-500 mb-4">If you proceed, you are automatically accepting our <span class="text-[var(--violet)]">Terms &amp; Conditions</span>.</p>
 
-      <p class="text-xs font-bold uppercase tracking-wide text-neutral-400 pt-2">Payment Method</p>
-      <div class="space-y-2">
-        <label class="flex items-center gap-2 border border-neutral-200 rounded px-3 py-2 text-sm cursor-pointer has-[:checked]:border-[var(--violet)]">
-          <input type="radio" name="payment" value="M-Pesa" checked class="accent-[var(--violet)]"/> M-Pesa
-        </label>
-        <label class="flex items-center gap-2 border border-neutral-200 rounded px-3 py-2 text-sm cursor-pointer has-[:checked]:border-[var(--violet)]">
-          <input type="radio" name="payment" value="Airtel Money" class="accent-[var(--violet)]"/> Airtel Money
-        </label>
-        <label class="flex items-center gap-2 border border-neutral-200 rounded px-3 py-2 text-sm cursor-pointer has-[:checked]:border-[var(--violet)]">
-          <input type="radio" name="payment" value="Card" class="accent-[var(--violet)]"/> Credit / Debit Card
-        </label>
-        <label class="flex items-center gap-2 border border-neutral-200 rounded px-3 py-2 text-sm cursor-pointer has-[:checked]:border-[var(--violet)]">
-          <input type="radio" name="payment" value="Pay on Delivery" class="accent-[var(--violet)]"/> Pay on Delivery
-        </label>
-      </div>
-
-      <div class="border-t border-neutral-100 pt-3 mt-3 space-y-1 text-sm">
-        <div class="flex justify-between"><span class="text-neutral-500">Subtotal</span><span>${formatPrice(subtotal)}</span></div>
+    <div class="border border-neutral-200 p-3 mb-3">
+      <p class="text-[11px] font-bold uppercase tracking-wide text-neutral-400 mb-2">Order Summary</p>
+      <div class="text-sm space-y-1">
+        <div class="flex justify-between"><span class="text-neutral-500">Item's Total (${itemCount})</span><span>${formatPrice(subtotal)}</span></div>
         <div class="flex justify-between"><span class="text-neutral-500">Delivery Fee</span><span>${formatPrice(deliveryFee)}</span></div>
-        <div class="flex justify-between font-bold text-base pt-1"><span>Total</span><span>${formatPrice(total)}</span></div>
+        <div class="flex justify-between font-bold text-base pt-2 border-t border-neutral-100 mt-1"><span>Total</span><span>${formatPrice(total)}</span></div>
+      </div>
+    </div>
+
+    <form id="checkoutForm" class="space-y-3">
+      <div class="border border-neutral-200 p-3">
+        <p class="text-[11px] font-bold uppercase tracking-wide text-neutral-400 mb-2">Payment Method</p>
+        <div class="space-y-2">
+          <label class="flex items-center gap-2 border border-neutral-200 rounded px-3 py-2 text-sm cursor-pointer has-[:checked]:border-[var(--violet)]">
+            <input type="radio" name="payment" value="M-Pesa" checked class="accent-[var(--violet)]"/> Pay Now with M-Pesa
+          </label>
+          <label class="flex items-center gap-2 border border-neutral-200 rounded px-3 py-2 text-sm cursor-pointer has-[:checked]:border-[var(--violet)]">
+            <input type="radio" name="payment" value="Airtel Money" class="accent-[var(--violet)]"/> Airtel Money
+          </label>
+          <label class="flex items-center gap-2 border border-neutral-200 rounded px-3 py-2 text-sm cursor-pointer has-[:checked]:border-[var(--violet)]">
+            <input type="radio" name="payment" value="Card" class="accent-[var(--violet)]"/> Credit / Debit Card
+          </label>
+          <label class="flex items-center gap-2 border border-neutral-200 rounded px-3 py-2 text-sm cursor-pointer has-[:checked]:border-[var(--violet)]">
+            <input type="radio" name="payment" value="Pay on Delivery" class="accent-[var(--violet)]"/> Pay on Delivery
+          </label>
+        </div>
       </div>
 
-      <button type="submit" class="w-full bg-[var(--violet)] hover:bg-[var(--violet-dark)] transition text-white font-semibold py-3 rounded-full mt-2">Place Order</button>
+      <div class="border border-neutral-200 p-3">
+        <p class="text-[11px] font-bold uppercase tracking-wide text-neutral-400 mb-2">Delivery Address</p>
+        <div class="space-y-2">
+          <input required name="fullName" value="${currentUser?currentUser.name:''}" placeholder="Full Name" class="w-full border border-neutral-200 rounded px-3 py-2 text-sm outline-none focus:border-[var(--violet)]"/>
+          <input required name="phone" placeholder="Phone Number (e.g. 07XX XXX XXX)" class="w-full border border-neutral-200 rounded px-3 py-2 text-sm outline-none focus:border-[var(--violet)]"/>
+          <input required name="address" placeholder="Delivery Address" class="w-full border border-neutral-200 rounded px-3 py-2 text-sm outline-none focus:border-[var(--violet)]"/>
+          <input required name="city" placeholder="Town / City" class="w-full border border-neutral-200 rounded px-3 py-2 text-sm outline-none focus:border-[var(--violet)]"/>
+        </div>
+      </div>
+
+      <button type="submit" class="w-full bg-[var(--violet)] hover:bg-[var(--violet-dark)] transition text-white font-semibold py-3 rounded-full mt-2">Confirm Order</button>
       <p class="text-[10px] text-neutral-400 text-center">Demo checkout — no real payment is processed.</p>
     </form>
   `;
@@ -87,6 +98,7 @@ function renderOrderConfirmation(orderId, payment, total){
   lucide.createIcons();
 }
 
-document.getElementById('checkoutBtn').addEventListener('click', openCheckout);
+document.getElementById('cartPageCheckoutBtn').addEventListener('click', openCheckout);
+document.getElementById('cartStickyCheckoutBtn').addEventListener('click', openCheckout);
 document.getElementById('closeCheckout').addEventListener('click', closeCheckoutModal);
 document.getElementById('checkoutOverlay').addEventListener('click', e=>{ if(e.target.id==='checkoutOverlay') closeCheckoutModal(); });
